@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Создание голосования</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- BOOTSTRAP> -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <!-- PARAMS -->
+    <link rel=stylesheet href="/css/main.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark" aria-label="Fourth navbar example">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse fs-5" id="navbar">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="/admin/cabinet">Назад</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="/">Профиль</a>
+                    </li>
+
+                </ul>
+                <a class="nav-link pt-0 ps-0" aria-current="page" href="/logout" >Выйти</a>
+            </div>
+        </div>
+    </nav>
+
+    <h1 class="text-center mb-4 display-1">Создание голосования</h1>
+            <div class="container-fluid mt-3" style="max-width: 450px">
+                <form class="col fs-4 text-center">
+                    <div class="isa_error" th:if="${param.notFilled}">
+                        Ни одно поле вопроса не заполнено
+                    </div>
+                </form>
+                <form class="col fs-1 text-center" th:action="@{/admin/voting/create}" th:object="${votingForm}" th:method="post">
+                    <th:block th:each="voting, iterStat : *{votingList}">
+
+                        <div th:if="${iterStat.index==0}" class="form-group">
+                            <textarea class="form-control fs-3"  placeholder="Введите тему обсуждения, которая будет вынесена на голосовании..." th:field="*{votingList[__${iterStat.index}__].theme}" rows="3"></textarea>
+                        </div>
+                        <div th:if="${iterStat.index>0}" hidden class="form-group voting">
+                            <textarea class="form-control fs-3 mt-2" placeholder="Введите тему обсуждения, которая будет вынесена на голосовании..." th:field="*{votingList[__${iterStat.index}__].theme}" rows="3"></textarea>
+                        </div>
+                    </th:block>
+                    <div class="form-group mt-3">
+                        <button onClick='show()' type="button" class="form-control btn btn-primary fs-4 rounded-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 20">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
+                            </svg> Добавить вопрос
+                        </button>
+                        <button type="submit" class="form-control btn btn-dark fs-1 rounded-3 mt-2">Создать</button>
+                    </div>
+
+                </form>
+            </div>
+</body>
+
+<script>
+    function show() {
+        let p = document.getElementsByClassName('voting');
+        let currP;
+
+        for (i = 0; i < p.length; i++) {
+            if (p[i].hasAttribute("hidden")) {
+                currP = p[i];
+                break;
+            }
+        }
+        if (currP == null){
+            alert("Создано максимальное количество вопросов!")
+        }
+
+        currP.removeAttribute("hidden");
+    }
+</script>
+</html>

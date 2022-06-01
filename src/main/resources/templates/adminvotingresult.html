@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Результаты голосования</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- BOOTSTRAP> -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark" aria-label="Fourth navbar example">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse fs-5" id="navbar">
+                <ul class="navbar-nav me-auto mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="/">Кабинет</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="/admin/voting/invite">Пригласить участников</a>
+                    </li>
+                </ul>
+                <a class="nav-link pt-0 ps-0" aria-current="page" href="/logout" >Выйти</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid mt-3" style="max-width: 550px">
+        <form class="col fs-1 text-center" th:action="@{/admin/voting/result}" th:object="${votingForm}" th:method="post">
+            <th:block th:each="voting, iterStat : *{votingList}">
+                <h1 th:text="*{votingList[__${iterStat.index}__].theme}"></h1>
+                <span hidden class="spanYes"  th:text="*{votingList[__${iterStat.index}__].yes}"></span>
+                <span hidden class="spanNo"  th:text="*{votingList[__${iterStat.index}__].no}"></span>
+                <span hidden class="spanNeutral"  th:text="*{votingList[__${iterStat.index}__].neutral}"></span>
+                <span hidden class="spanBroken"  th:text="*{votingList[__${iterStat.index}__].broken}"></span>
+                <div class="form-group fs-3">
+
+                    <label>За</label>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-info"
+                             role="progressbar"
+                             th:style="'width:' + ( *{votingList[__${iterStat.index}__].yesValue} ) + '%;'"
+                             aria-valuenow="25"
+                             aria-valuemin="0"
+                             aria-valuemax="100"
+                             th:text="*{votingList[__${iterStat.index}__].yes}">
+                        </div>
+                    </div>
+
+                    <label >Против</label>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-no"
+                             role="progressbar"
+                             th:style="'width:' + ( *{votingList[__${iterStat.index}__].noValue} ) + '%;'"
+                             aria-valuenow="25"
+                             aria-valuemin="0"
+                             aria-valuemax="100"
+                             th:text="*{votingList[__${iterStat.index}__].no}">
+                        </div>
+                    </div>
+                    <label >Воздержались</label>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-neutral"
+                             role="progressbar"
+                             th:style="'width:' + ( *{votingList[__${iterStat.index}__].neutralValue} ) + '%;'"
+                             aria-valuenow="25"
+                             aria-valuemin="0"
+                             aria-valuemax="100"
+                             th:text="*{votingList[__${iterStat.index}__].neutral}">
+                        </div>
+                    </div>
+                    <label >Испорченные бюллетени</label>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-broken"
+                             role="progressbar"
+                             th:style="'width:' + ( *{votingList[__${iterStat.index}__].brokenValue} ) + '%;'"
+                             aria-valuenow="25"
+                             aria-valuemin="0"
+                             aria-valuemax="100"
+                             th:text="*{votingList[__${iterStat.index}__].broken}">
+                        </div>
+                    </div>
+                    <label >Не проголосовали</label>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-broken"
+                             role="progressbar"
+                             th:style="'width:' + ( *{votingList[__${iterStat.index}__].notVotedValue} ) + '%;'"
+                             aria-valuenow="25"
+                             aria-valuemin="0"
+                             aria-valuemax="100"
+                             th:text="*{votingList[__${iterStat.index}__].notVotedSize}">
+                        </div>
+                    </div>
+                </div>
+
+            </th:block>
+            <h1 th:text="'Количество участников:' + ${votingForm.userSize}"></h1>
+            <div class="form-group">
+                <button type="submit" class="form-control btn btn-dark fs-1 rounded-3">Обновить</button>
+            </div>
+        </form>
+        <form class="col fs-1 text-center">
+            <div class="form-group">
+                <button type="submit" onclick="window.open('/admin/voting/result/report/', '_blank');" class="form-control btn btn-dark fs-1 rounded-3">Получить отчёт</button>
+            </div>
+        </form>
+        <form class="col fs-1 text-center" th:action="@{/admin/voting/result/close}" th:method="post">
+            <div class="form-group">
+                <button type="submit" class="form-control btn btn-dark fs-1 rounded-3">Закрыть голосование</button>
+            </div>
+        </form>
+    </div>
+</body>
+<!--<script>
+    let spansYes = document.getElementsByClassName("spanYes");
+    let spansNo = document.getElementsByClassName("spanNo");
+    let spansNeutral = document.getElementsByClassName("spanNeutral");
+    let spansBroken = document.getElementsByClassName("spanBroken");
+    let progressBarList = document.getElementsByClassName("progress-bar");
+    let progressBarYesList = document.getElementsByClassName("progress-bar-yes");
+    let progressBarNoList = document.getElementsByClassName("progress-bar-no");
+    let progressBarNeutralList = document.getElementsByClassName("progress-bar-neutral");
+    let progressBarBrokenList = document.getElementsByClassName("progress-bar-broken");
+
+    progressBarList.forEach(element => {
+        if (element.classList.contains("progress-bar-yes")){
+            element.style.cssText = "width: " + ;
+        }
+    });
+
+
+    b.setAttribute("disabled", "disabled");
+</script>-->
+</html>
