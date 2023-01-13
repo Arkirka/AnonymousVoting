@@ -1,4 +1,4 @@
-package ru.vorobyov.VotingServWithAuth.services;
+package ru.vorobyov.VotingServWithAuth.services.implementations;
 
 public enum UserRoles {
     ROLE_ADMIN{
@@ -16,7 +16,7 @@ public enum UserRoles {
         public String toString() {
             return "ROLE_VOTER";
         }
-    };
+    }
 
 
 }

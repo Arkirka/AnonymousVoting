@@ -1,4 +1,4 @@
-package ru.vorobyov.VotingServWithAuth.services;
+package ru.vorobyov.VotingServWithAuth.services.implementations;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,10 +14,10 @@ public class UserDetailsImpl implements UserDetails {
 
     private static final long serialVersionUID = 1L;
 
-    private String userName;
-    private String password;
-    private boolean isActive;
-    private List<GrantedAuthority> authorities;
+    private final String userName;
+    private final String password;
+    private final boolean isActive;
+    private final List<GrantedAuthority> authorities;
 
     public UserDetailsImpl(User user) {
         this.userName = user.getUserName();
@@ -27,8 +27,6 @@ public class UserDetailsImpl implements UserDetails {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
-
-    public UserDetailsImpl() {}
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

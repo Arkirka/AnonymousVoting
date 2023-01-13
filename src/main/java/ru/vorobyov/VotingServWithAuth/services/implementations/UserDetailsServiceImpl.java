@@ -1,4 +1,4 @@
-package ru.vorobyov.VotingServWithAuth.services;
+package ru.vorobyov.VotingServWithAuth.services.implementations;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.vorobyov.VotingServWithAuth.entities.User;
@@ -57,7 +56,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public boolean saveUser(User user) {
         Optional<User> userFromDB = userRepository.findByUserName(user.getUserName());
-        //TODO REMEMBER TO THROW EXCEPTION WHEN USE THIS
         if (userFromDB.isPresent())
             return false;
         user.setRoles(user.getRoles());
@@ -91,11 +89,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Optional<User> userFromDB = userRepository.findByUserName(user.getUserName());
         //TODO REMEMBER TO THROW EXCEPTION WHEN USE THIS
         if (!userFromDB.isPresent())
-            return false;
+            return true;
         User temp = userFromDB.get();
         temp.setRoles(UserRoles.ROLE_VOTER.toString());
         userRepository.save(temp);
-        return true;
+        return false;
     }
 
     public boolean updateUserVoterToDefault(String username) {
@@ -122,10 +120,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public User findUserByUsername(String userName){
         Optional<User> userFromDB = userRepository.findByUserName(userName);
-        if (userFromDB.isPresent())
-            return userFromDB.get();
-        else
-            return null;
+        return userFromDB.orElse(null);
     }
 
     public boolean isUserExist(User user){
@@ -133,20 +128,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (!userOptionalFromDB.isPresent())
             return false;
         User userFromDb = userOptionalFromDB.get();
-        if (userFromDb.getUserName().equals(user.getUserName())
+        return userFromDb.getUserName().equals(user.getUserName())
                 && userFromDb.getFullName().equals(user.getFullName())
-                && userFromDb.getEmail().equals(user.getEmail()))
-            return true;
-        else
-            return false;
+                && userFromDb.getEmail().equals(user.getEmail());
     }
 
     public boolean isUserExist(int id){
         Optional<User> userOptionalFromDB = userRepository.findById(id);
-        if (userOptionalFromDB.isPresent())
-            return true;
-        else
-            return false;
+        return userOptionalFromDB.isPresent();
     }
 
     public boolean saveUserDefaultAdmin(User user) {
