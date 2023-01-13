@@ -1,27 +1,25 @@
 package ru.vorobyov.VotingServWithAuth.controller.admin;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.client.HttpClientErrorException;
 import ru.vorobyov.VotingServWithAuth.dataToObject.AdditionVotersToVotingDto;
-import ru.vorobyov.VotingServWithAuth.dataToObject.VotingDefaultDto;
 import ru.vorobyov.VotingServWithAuth.entities.User;
-import ru.vorobyov.VotingServWithAuth.services.UserDetailsServiceImpl;
+import ru.vorobyov.VotingServWithAuth.services.implementations.UserDetailsServiceImpl;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 @Controller
 public class AdminControlPanelController {
-    @Autowired
-    private UserDetailsServiceImpl userService;
+    private final UserDetailsServiceImpl userService;
+
+    public AdminControlPanelController(UserDetailsServiceImpl userService) {
+        this.userService = userService;
+    }
+
     @GetMapping("/admin/panel")
     public String getPage(Model model){
         AdditionVotersToVotingDto userForm = getAllUsersFromDb();
@@ -39,7 +37,7 @@ public class AdminControlPanelController {
     }
 
     @PostMapping("/admin/panel/edit/{id}")
-    public String updateUser(@PathVariable("id") int id, @ModelAttribute("userForm") @Validated User user, Model model) {
+    public String updateUser(@PathVariable("id") int id, @ModelAttribute("userForm") @Validated User user) {
         if (userService.updateUser(user)){
             return "redirect:/admin/panel/edit/" + id + "?success";
         }

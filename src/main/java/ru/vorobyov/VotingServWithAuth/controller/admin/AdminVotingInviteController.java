@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.vorobyov.VotingServWithAuth.dataToObject.AdditionVotersToVotingDto;
 import ru.vorobyov.VotingServWithAuth.entities.User;
-import ru.vorobyov.VotingServWithAuth.services.EmailService;
-import ru.vorobyov.VotingServWithAuth.services.UserDetailsServiceImpl;
-import ru.vorobyov.VotingServWithAuth.services.UserRoles;
-import ru.vorobyov.VotingServWithAuth.services.VotingService;
+import ru.vorobyov.VotingServWithAuth.services.interfaces.EmailService;
+import ru.vorobyov.VotingServWithAuth.services.implementations.UserDetailsServiceImpl;
+import ru.vorobyov.VotingServWithAuth.services.implementations.UserRoles;
+import ru.vorobyov.VotingServWithAuth.services.interfaces.VotingService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +39,7 @@ public class AdminVotingInviteController {
     @PostMapping("/admin/voting/invite")
     public String addUser(@ModelAttribute("userForm") @Validated AdditionVotersToVotingDto form) {
         changeCheckedUsersRoleToVoter(form.getUserList());
-        updateVotingUserSize(form.getUserList().stream().filter(el -> el.getIsVoter()).collect(Collectors.toList()).size());
+        updateVotingUserSize((int) form.getUserList().stream().filter(User::getIsVoter).count());
         return "redirect:/admin/voting/result";
     }
 
@@ -61,7 +61,7 @@ public class AdminVotingInviteController {
 
     private void changeRole(int id){
         User user = userService.findUserById(id);
-        if (!userService.updateUserDefaultToVoter(user))
+        if (userService.updateUserDefaultToVoter(user))
             throw new UsernameNotFoundException("User not found");
     }
 

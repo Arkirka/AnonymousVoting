@@ -8,13 +8,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.vorobyov.VotingServWithAuth.dataToObject.UserVotingProcessDto;
-import ru.vorobyov.VotingServWithAuth.dataToObject.data.VoteThemeResult;
 import ru.vorobyov.VotingServWithAuth.entities.User;
-import ru.vorobyov.VotingServWithAuth.entities.Voting;
-import ru.vorobyov.VotingServWithAuth.services.UserDetailsServiceImpl;
-import ru.vorobyov.VotingServWithAuth.services.VotingService;
+import ru.vorobyov.VotingServWithAuth.services.implementations.UserDetailsServiceImpl;
+import ru.vorobyov.VotingServWithAuth.services.interfaces.VotingService;
 
-import java.util.List;
+import static ru.vorobyov.VotingServWithAuth.controller.voter.VoterProcessController.getUserVotingProcessDto;
 
 @Controller
 public class UserRedirectToVotingController {
@@ -41,18 +39,11 @@ public class UserRedirectToVotingController {
 
     private void changeRole(){
         User user = userService.findUserByUsername(getCurrentUsername());
-        if (!userService.updateUserDefaultToVoter(user))
+        if (userService.updateUserDefaultToVoter(user))
             throw new UsernameNotFoundException("User not found");
     }
 
     private UserVotingProcessDto getUserVotingProcessDtoWithThemes(){
-        UserVotingProcessDto votingForm = new UserVotingProcessDto();
-        List<Voting> votingList =  votingService.findAll();
-        for (Voting voting : votingList){
-            VoteThemeResult tempVoteThemeResult = new VoteThemeResult();
-            tempVoteThemeResult.setTheme(voting.getTheme());
-            votingForm.addVoteThemeResult(tempVoteThemeResult);
-        }
-        return votingForm;
+        return getUserVotingProcessDto(votingService);
     }
 }

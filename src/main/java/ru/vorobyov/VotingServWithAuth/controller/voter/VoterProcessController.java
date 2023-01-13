@@ -1,36 +1,36 @@
 package ru.vorobyov.VotingServWithAuth.controller.voter;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.vorobyov.VotingServWithAuth.dataToObject.UserVotingProcessDto;
 import ru.vorobyov.VotingServWithAuth.dataToObject.data.VoteThemeResult;
 import ru.vorobyov.VotingServWithAuth.entities.Vote;
 import ru.vorobyov.VotingServWithAuth.entities.Voting;
-import ru.vorobyov.VotingServWithAuth.services.UserDetailsServiceImpl;
-import ru.vorobyov.VotingServWithAuth.services.VoteService;
-import ru.vorobyov.VotingServWithAuth.services.VotingService;
+import ru.vorobyov.VotingServWithAuth.services.implementations.UserDetailsServiceImpl;
+import ru.vorobyov.VotingServWithAuth.services.interfaces.VoteService;
+import ru.vorobyov.VotingServWithAuth.services.interfaces.VotingService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class VoterProcessController {
-    @Autowired
-    public VotingService votingService;
-    @Autowired
-    public VoteService voteService;
-    @Autowired
-    private UserDetailsServiceImpl userService;
+    public final VotingService votingService;
+    public final VoteService voteService;
+    private final UserDetailsServiceImpl userService;
+
+    public VoterProcessController(VotingService votingService, VoteService voteService, UserDetailsServiceImpl userService) {
+        this.votingService = votingService;
+        this.voteService = voteService;
+        this.userService = userService;
+    }
 
     @GetMapping("/voter/voting")
     public String createVoting(Model model) {
@@ -43,7 +43,7 @@ public class VoterProcessController {
     }
 
     @PostMapping("/voter/voting")
-    public String submit(@ModelAttribute("userForm") @Validated UserVotingProcessDto form, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String submit(@ModelAttribute("userForm") @Validated UserVotingProcessDto form) throws Exception {
         List<VoteThemeResult> voteThemeResultList = form.getVoteThemeResultList();
         addVotesToDb(voteThemeResultList);
         addVotingToDb(voteThemeResultList);
@@ -52,6 +52,10 @@ public class VoterProcessController {
     }
 
     private UserVotingProcessDto getUserVotingProcessDtoWithThemes(){
+        return getUserVotingProcessDto(votingService);
+    }
+
+    public static UserVotingProcessDto getUserVotingProcessDto(VotingService votingService) {
         UserVotingProcessDto votingForm = new UserVotingProcessDto();
         List<Voting> votingList =  votingService.findAll();
         for (Voting voting : votingList){
@@ -81,8 +85,7 @@ public class VoterProcessController {
         voteService.saveAll(voteList);
     }
 
-    private void addVotingToDb(List<VoteThemeResult> voteThemeResultList){
-        List<Voting> votingList = new ArrayList<>();
+    private void addVotingToDb(List<VoteThemeResult> voteThemeResultList) throws Exception {
         List<Integer> ids = new ArrayList<>();
         for(Voting voting : votingService.findAll()){
             ids.add(voting.getId());

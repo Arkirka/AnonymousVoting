@@ -1,17 +1,20 @@
 package ru.vorobyov.VotingServWithAuth.controller.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import ru.vorobyov.VotingServWithAuth.services.UserDetailsServiceImpl;
+import ru.vorobyov.VotingServWithAuth.services.implementations.UserDetailsServiceImpl;
 
 @Controller
 public class UserProfileController {
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
+
+    public UserProfileController(UserDetailsServiceImpl userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
     @GetMapping("/user/profile")
     public String getPage(Model model){
         model.addAttribute("userRole", getRole());

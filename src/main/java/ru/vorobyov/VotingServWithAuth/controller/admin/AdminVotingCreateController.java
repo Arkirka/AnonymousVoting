@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.vorobyov.VotingServWithAuth.dataToObject.VotingDefaultDto;
 import ru.vorobyov.VotingServWithAuth.entities.Voting;
-import ru.vorobyov.VotingServWithAuth.services.VotingService;
+import ru.vorobyov.VotingServWithAuth.services.interfaces.VotingService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,11 +42,9 @@ public class AdminVotingCreateController {
     }
 
     private List<Voting> getOnlyNotEmptyVotingDefaultList(Iterable<Voting> votingList){
-        List<Voting> list = new ArrayList();
+        List<Voting> list = new ArrayList<>();
         for (Voting voting : votingList){
-            if (voting.getTheme().equals(""))
-                continue;
-            else
+            if (!voting.getTheme().equals(""))
                 list.add(voting);
         }
         return list;

@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.vorobyov.VotingServWithAuth.dataToObject.VotingDefaultDto;
 import ru.vorobyov.VotingServWithAuth.entities.Voting;
-import ru.vorobyov.VotingServWithAuth.services.UserDetailsServiceImpl;
-import ru.vorobyov.VotingServWithAuth.services.VoteService;
-import ru.vorobyov.VotingServWithAuth.services.VotingService;
+import ru.vorobyov.VotingServWithAuth.services.implementations.UserDetailsServiceImpl;
+import ru.vorobyov.VotingServWithAuth.services.interfaces.VoteService;
+import ru.vorobyov.VotingServWithAuth.services.interfaces.VotingService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +39,7 @@ public class AdminVotingResultController {
     }
 
     @PostMapping("admin/voting/result/close")
-    public String close(Model model){
+    public String close(){
         closeVoting();
         return "redirect:/admin/cabinet/";
     }

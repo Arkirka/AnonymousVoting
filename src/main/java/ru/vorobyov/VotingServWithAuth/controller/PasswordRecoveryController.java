@@ -1,35 +1,33 @@
 package ru.vorobyov.VotingServWithAuth.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.vorobyov.VotingServWithAuth.entities.RecoveryLink;
 import ru.vorobyov.VotingServWithAuth.entities.User;
-import ru.vorobyov.VotingServWithAuth.services.EmailService;
-import ru.vorobyov.VotingServWithAuth.services.RecoveryLinkService;
-import ru.vorobyov.VotingServWithAuth.services.UserDetailsServiceImpl;
+import ru.vorobyov.VotingServWithAuth.services.implementations.UserDetailsServiceImpl;
+import ru.vorobyov.VotingServWithAuth.services.interfaces.EmailService;
+import ru.vorobyov.VotingServWithAuth.services.interfaces.RecoveryLinkService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 import java.util.UUID;
 
 @Controller
 public class PasswordRecoveryController {
-    @Autowired
-    private UserDetailsServiceImpl userService;
-    @Autowired
-    private EmailService emailService;
-    @Autowired
-    private RecoveryLinkService recoveryLinkService;
+    private final UserDetailsServiceImpl userService;
+    private final EmailService emailService;
+    private final RecoveryLinkService recoveryLinkService;
+
+    public PasswordRecoveryController(UserDetailsServiceImpl userService, EmailService emailService, RecoveryLinkService recoveryLinkService) {
+        this.userService = userService;
+        this.emailService = emailService;
+        this.recoveryLinkService = recoveryLinkService;
+    }
+
     @GetMapping("/login/recovery")
     public String getPage(Model model){
         if (!model.containsAttribute("userForm"))
@@ -41,8 +39,7 @@ public class PasswordRecoveryController {
 
     @PostMapping("/login/recovery/password")
     public String redirectToChangePassword(@ModelAttribute("userForm") @Validated User userForm,
-                                           BindingResult bindingResult,
-                                           Model model, RedirectAttributes redirectAttributes,
+                                           Model model,
                                            HttpServletRequest request) {
         model.addAttribute("error", "");
         if (userForm.getUserName().equals("")  || userForm.getFullName().equals("") || userForm.getEmail().equals("")){
@@ -61,21 +58,19 @@ public class PasswordRecoveryController {
 
     @GetMapping("/login/recovery/password/{uuid}")
     public String redirect(@PathVariable String uuid, Model model) throws Exception {
-        Optional<RecoveryLink> recoveryLinkOptional = recoveryLinkService.findRecoveryLinkByLink(uuid);
-        if (!recoveryLinkOptional.isPresent()){
+        RecoveryLink recoveryLink = recoveryLinkService.findRecoveryLinkByLink(uuid).get();
+        if (recoveryLink == null){
             throw new Exception("Not found");
         }
-
-        model.addAttribute("userForm", recoveryLinkOptional.get().getUser());
+        model.addAttribute("userForm", recoveryLink.getUser());
         return "loginrecoverychange";
     }
 
     @PostMapping("/login/recovery/password/{uuid}")
     public String changePassword(@PathVariable String uuid, @ModelAttribute("userForm") @Validated User userForm,
-                                 HttpServletRequest request,
-                                 Model model) throws Exception {
-        Optional<RecoveryLink> recoveryLinkOptional = recoveryLinkService.findRecoveryLinkByLink(uuid);
-        if (!recoveryLinkOptional.isPresent()){
+                                 HttpServletRequest request) throws Exception {
+        RecoveryLink recoveryLink = recoveryLinkService.findRecoveryLinkByLink(uuid).get();
+        if (recoveryLink == null){
             throw new Exception("Not found");
         }
         if (userForm.getPassword().equals("") || userForm.getPassword().isEmpty()){
@@ -83,7 +78,7 @@ public class PasswordRecoveryController {
         }
         if (userForm.getPassword().equals(userForm.getPasswordRepeat())){
             if (userService.updateUserPassword(userForm)){
-                recoveryLinkService.delete(recoveryLinkOptional.get().getId());
+                recoveryLinkService.delete(recoveryLink.getId());
                 return "redirect:/login?passwordChanged";
             }
             else
@@ -110,8 +105,4 @@ public class PasswordRecoveryController {
         recoveryLinkService.create(recoveryLink);
     }
 
-    public String getCurrentUsername() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth.getName();
-    }
 }

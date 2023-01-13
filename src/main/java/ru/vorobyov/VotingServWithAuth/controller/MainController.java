@@ -1,18 +1,20 @@
 package ru.vorobyov.VotingServWithAuth.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import ru.vorobyov.VotingServWithAuth.services.UserDetailsServiceImpl;
-import ru.vorobyov.VotingServWithAuth.services.UserRoles;
+import ru.vorobyov.VotingServWithAuth.services.implementations.UserDetailsServiceImpl;
+import ru.vorobyov.VotingServWithAuth.services.implementations.UserRoles;
 
 @Controller
 public class MainController {
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
+
+    public MainController(UserDetailsServiceImpl userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @GetMapping("/")
     public String redirect(){
