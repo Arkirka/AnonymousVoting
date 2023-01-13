@@ -18,7 +18,7 @@
             <th:block th:each="voteThemeResult, iterStat : *{voteThemeResultList}">
                 <h1 class="text-center mb-4 display-3" th:inline="text" >
                     <span th:text="*{voteThemeResultList[__${iterStat.index}__].theme}"></span>
-                    <span hidden th:field="*{voteThemeResultList[__${iterStat.index}__].theme}"></span>
+                    <input hidden th:field="*{voteThemeResultList[__${iterStat.index}__].theme}" th:value="*{voteThemeResultList[__${iterStat.index}__].theme}"/>
                 </h1>
                 <div class="row justify-content-md-center fs-3">
                     <div class="col-8 col-sm-5 col-md-3 col-lg-3 col-xxl-2 mx-auto">
