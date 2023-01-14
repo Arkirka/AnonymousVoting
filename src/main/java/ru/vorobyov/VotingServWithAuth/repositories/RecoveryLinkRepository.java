@@ -5,10 +5,8 @@ import org.springframework.stereotype.Repository;
 import ru.vorobyov.VotingServWithAuth.entities.RecoveryLink;
 import ru.vorobyov.VotingServWithAuth.entities.User;
 
-import java.util.List;
-
 @Repository
 public interface RecoveryLinkRepository extends CrudRepository<RecoveryLink, Integer> {
     RecoveryLink findRecoveryLinkByLink(String link);
-    List<RecoveryLink> findRecoveryLinksByUser(User user);
+    RecoveryLink findRecoveryLinkByUser(User user);
 }

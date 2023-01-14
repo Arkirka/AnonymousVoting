@@ -7,9 +7,7 @@ import ru.vorobyov.VotingServWithAuth.entities.User;
 import ru.vorobyov.VotingServWithAuth.repositories.RecoveryLinkRepository;
 import ru.vorobyov.VotingServWithAuth.services.interfaces.RecoveryLinkService;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service("recoveryLinkService")
 public class RecoveryLinkServiceImpl implements RecoveryLinkService {
@@ -34,27 +32,24 @@ public class RecoveryLinkServiceImpl implements RecoveryLinkService {
     @Async
     @Override
     public void create(RecoveryLink recoveryLink) {
-        findAllIdByUser(recoveryLink.getUser()).thenAcceptAsync(result -> {
-            deleteAllById(result);
+        findIdByUser(recoveryLink.getUser()).thenAcceptAsync(result -> {
+            deleteById(result);
             recoveryLinkRepository.save(recoveryLink);
         });
     }
 
     @Async
     @Override
-    public CompletableFuture<List<Integer>> findAllIdByUser(User user) {
+    public CompletableFuture<Integer> findIdByUser(User user) {
         return CompletableFuture
                 .completedFuture(
-                        recoveryLinkRepository.findRecoveryLinksByUser(user)
-                                .stream()
-                                .map(RecoveryLink::getId)
-                                .collect(Collectors.toList())
+                        recoveryLinkRepository.findRecoveryLinkByUser(user).getId()
                 );
     }
 
     @Override
-    public void deleteAllById(List<Integer> ids) {
-        recoveryLinkRepository.deleteAllById(ids);
+    public void deleteById(Integer id) {
+        recoveryLinkRepository.deleteById(id);
     }
 
     @Async
