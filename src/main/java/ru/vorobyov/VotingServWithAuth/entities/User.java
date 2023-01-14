@@ -2,6 +2,7 @@ package ru.vorobyov.VotingServWithAuth.entities;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "user")
@@ -128,5 +129,18 @@ public class User {
 
     public void setRecoveryLinkList(List<RecoveryLink> recoveryLinkList) {
         this.recoveryLinkList = recoveryLinkList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return isVoter() == user.isVoter() && isActive() == user.isActive() && getId().equals(user.getId()) && getUserName().equals(user.getUserName()) && Objects.equals(getFullName(), user.getFullName()) && getEmail().equals(user.getEmail()) && Objects.equals(getPassword(), user.getPassword()) && Objects.equals(getPasswordRepeat(), user.getPasswordRepeat()) && Objects.equals(getRoles(), user.getRoles()) && Objects.equals(getActivateLinkList(), user.getActivateLinkList()) && Objects.equals(getRecoveryLinkList(), user.getRecoveryLinkList());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getUserName(), getFullName(), getEmail(), getPassword(), getPasswordRepeat(), isVoter(), isActive(), getRoles(), getActivateLinkList(), getRecoveryLinkList());
     }
 }

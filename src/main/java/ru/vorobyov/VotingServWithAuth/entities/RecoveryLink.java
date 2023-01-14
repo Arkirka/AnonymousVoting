@@ -1,6 +1,7 @@
 package ru.vorobyov.VotingServWithAuth.entities;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "RecoveryLink")
@@ -38,5 +39,18 @@ public class RecoveryLink {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RecoveryLink that = (RecoveryLink) o;
+        return getId() == that.getId() && getLink().equals(that.getLink());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getLink());
     }
 }
