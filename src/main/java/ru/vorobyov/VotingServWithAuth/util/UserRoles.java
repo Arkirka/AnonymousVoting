@@ -1,4 +1,4 @@
-package ru.vorobyov.VotingServWithAuth.services.implementations;
+package ru.vorobyov.VotingServWithAuth.util;
 
 public enum UserRoles {
     ROLE_ADMIN{
