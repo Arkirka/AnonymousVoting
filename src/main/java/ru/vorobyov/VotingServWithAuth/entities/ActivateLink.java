@@ -17,6 +17,14 @@ public class ActivateLink {
     @JoinColumn(name="user_id", referencedColumnName = "id", unique = true, nullable = false)
     private User user;
 
+    public ActivateLink(String link, User user) {
+        this.link = link;
+        this.user = user;
+    }
+
+    public ActivateLink() {
+    }
+
     public int getId() {
         return id;
     }

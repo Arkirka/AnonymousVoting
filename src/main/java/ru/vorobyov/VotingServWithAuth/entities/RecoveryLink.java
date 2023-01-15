@@ -17,6 +17,13 @@ public class RecoveryLink {
     @JoinColumn(name="user_id", referencedColumnName = "id", unique = true, nullable = false)
     private User user;
 
+    public RecoveryLink(String link, User user) {
+        this.link = link;
+        this.user = user;
+    }
+
+    public RecoveryLink(){}
+
     public int getId() {
         return id;
     }

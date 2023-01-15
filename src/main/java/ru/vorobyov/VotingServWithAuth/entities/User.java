@@ -1,5 +1,7 @@
 package ru.vorobyov.VotingServWithAuth.entities;
 
+import ru.vorobyov.VotingServWithAuth.util.UserRoles;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +29,14 @@ public class User {
     private List<ActivateLink> activateLinkList;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
     private List<RecoveryLink> recoveryLinkList;
+
+    public User(String userName, String email, UserRoles userRoles) {
+        this.userName = userName;
+        this.email = email;
+        this.roles = userRoles.name();
+    }
+
+    public User(){}
 
     public Integer getId() {
         return id;
@@ -136,11 +146,11 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return isVoter() == user.isVoter() && isActive() == user.isActive() && getId().equals(user.getId()) && getUserName().equals(user.getUserName()) && Objects.equals(getFullName(), user.getFullName()) && getEmail().equals(user.getEmail()) && Objects.equals(getPassword(), user.getPassword()) && Objects.equals(getPasswordRepeat(), user.getPasswordRepeat()) && Objects.equals(getRoles(), user.getRoles()) && Objects.equals(getActivateLinkList(), user.getActivateLinkList()) && Objects.equals(getRecoveryLinkList(), user.getRecoveryLinkList());
+        return isVoter() == user.isVoter() && isActive() == user.isActive() && getId().equals(user.getId()) && getUserName().equals(user.getUserName()) && Objects.equals(getFullName(), user.getFullName()) && getEmail().equals(user.getEmail()) && Objects.equals(getPassword(), user.getPassword()) && Objects.equals(getPasswordRepeat(), user.getPasswordRepeat()) && getRoles().equals(user.getRoles());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getUserName(), getFullName(), getEmail(), getPassword(), getPasswordRepeat(), isVoter(), isActive(), getRoles(), getActivateLinkList(), getRecoveryLinkList());
+        return Objects.hash(getId(), getUserName(), getFullName(), getEmail(), getPassword(), getPasswordRepeat(), isVoter(), isActive(), getRoles());
     }
 }
