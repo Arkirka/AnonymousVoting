@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import ru.vorobyov.VotingServWithAuth.services.implementations.UserDetailsServiceImpl;
-import ru.vorobyov.VotingServWithAuth.services.implementations.UserRoles;
+import ru.vorobyov.VotingServWithAuth.util.UserRoles;
 
 @Controller
 public class MainController {

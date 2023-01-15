@@ -70,28 +70,34 @@ public class PasswordRecoveryController {
     public String changePassword(@PathVariable String uuid, @ModelAttribute("userForm") @Validated User userForm,
                                  HttpServletRequest request) throws Exception {
         RecoveryLink recoveryLink = recoveryLinkService.findRecoveryLinkByLink(uuid).get();
+        StringBuilder redirect = new StringBuilder("redirect:");
         if (recoveryLink == null){
             throw new Exception("Not found");
         }
         if (userForm.getPassword().equals("") || userForm.getPassword().isEmpty()){
-            return "redirect:" + request.getRequestURI() + "?notFilled";
+            return redirect.append(request.getRequestURI()).append("?notFilled").toString();
         }
         if (userForm.getPassword().equals(userForm.getPasswordRepeat())){
             if (userService.updateUserPassword(userForm)){
                 recoveryLinkService.delete(recoveryLink.getId());
-                return "redirect:/login?passwordChanged";
+                return redirect.append("/login?passwordChanged").toString();
             }
             else
-                return "redirect:" + request.getRequestURI() + "?notFound";
+                return redirect.append(request.getRequestURI()).append("?notFound").toString();
         } else {
-            return "redirect:" + request.getRequestURI() + "?mismatch";
+            return redirect.append(request.getRequestURI()).append("?mismatch").toString();
         }
     }
 
     private void sendRecoveryLinkToEmail(User user, String url){
         String uuid = getUUID();
         addLinkToDb(user, uuid);
-        emailService.sendSimpleEmail(user.getEmail(), "Восстановление пароля учетной записи", "Перейдите по ссылке для смены пароля в своей учетной записи: " + url + "/" + uuid);
+        StringBuilder message = new StringBuilder("Перейдите по ссылке для смены пароля в своей учетной записи: ");
+        emailService.sendSimpleEmail(
+                user.getEmail(),
+                "Восстановление пароля учетной записи",
+                message.append(url).append("/") .append(uuid).toString()
+        );
     }
 
     private String getUUID(){
@@ -99,10 +105,11 @@ public class PasswordRecoveryController {
     }
 
     private void addLinkToDb(User user, String uuid) {
-        RecoveryLink recoveryLink = new RecoveryLink();
-        recoveryLink.setLink(uuid);
-        recoveryLink.setUser(user);
-        recoveryLinkService.create(recoveryLink);
+        if (user == null || uuid == null )
+            throw new NullPointerException("User or uuid is empty!");
+        if (uuid.isEmpty())
+            throw new IllegalArgumentException("Uuid must not be empty!");
+        recoveryLinkService.create(new RecoveryLink(uuid, user));
     }
 
 }

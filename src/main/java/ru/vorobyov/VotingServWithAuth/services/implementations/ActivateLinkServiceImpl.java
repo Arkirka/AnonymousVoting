@@ -6,6 +6,7 @@ import ru.vorobyov.VotingServWithAuth.entities.ActivateLink;
 import ru.vorobyov.VotingServWithAuth.repositories.ActivateLinkRepository;
 import ru.vorobyov.VotingServWithAuth.services.interfaces.ActivateLinkService;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.concurrent.CompletableFuture;
 
 @Service("activateLinkService")
@@ -19,7 +20,14 @@ public class ActivateLinkServiceImpl implements ActivateLinkService {
     @Async
     @Override
     public CompletableFuture<ActivateLink> findActivateLinkByLink(String link) {
-        return CompletableFuture.completedFuture(activateLinkRepository.findActivateLinkByLink(link));
+        StringBuilder exceptionMessage = new StringBuilder("Activate link ");
+        return CompletableFuture.completedFuture(
+                activateLinkRepository.findActivateLinkByLink(link).orElseThrow(() ->
+                    new EntityNotFoundException(
+                            exceptionMessage.append(link).append(" not found.").toString()
+                    )
+                )
+        );
     }
 
     @Async

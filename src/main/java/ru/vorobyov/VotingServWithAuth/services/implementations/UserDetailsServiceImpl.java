@@ -1,10 +1,5 @@
 package ru.vorobyov.VotingServWithAuth.services.implementations;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,12 +7,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.vorobyov.VotingServWithAuth.entities.User;
 import ru.vorobyov.VotingServWithAuth.repositories.UserRepository;
+import ru.vorobyov.VotingServWithAuth.util.UserRoles;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public UserDetailsServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
@@ -46,7 +49,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public boolean updateUser(User user) {
         Optional<User> userFromDB = userRepository.findById(user.getId());
-        //TODO REMEMBER TO THROW EXCEPTION WHEN USE THIS
         if (!userFromDB.isPresent())
             return false;
         user.setPassword(userFromDB.get().getPassword());
@@ -66,13 +68,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public boolean saveUserDefaultUser(User user) {
         Optional<User> userFromDB = userRepository.findByUserName(user.getUserName());
-        //TODO REMEMBER TO THROW EXCEPTION WHEN USE THIS
         if (userFromDB.isPresent())
             return false;
         user.setUserName(user.getUserName().trim());
         user.setEmail(user.getEmail().trim());
         user.setFullName(user.getFullName().trim());
-        user.setRoles(UserRoles.ROLE_USER.toString());
+        user.setRoles(UserRoles.ROLE_USER.name());
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword().trim()));
 
         userRepository.save(user);
@@ -80,36 +81,37 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public void updateAllVotersToUsers(){
-        List<User> userList = allUsers().stream().filter(el -> el.getRoles().equals(UserRoles.ROLE_VOTER.toString())).peek(el -> el.setRoles(UserRoles.ROLE_USER.toString())).collect(Collectors.toList());
+        List<User> userList = allUsers()
+                .stream()
+                .filter(el -> el.getRoles().equals(UserRoles.ROLE_VOTER.name()))
+                .peek(el -> el.setRoles(UserRoles.ROLE_USER.name()))
+                .collect(Collectors.toList());
         userRepository.saveAll(userList);
     }
 
 
     public boolean updateUserDefaultToVoter(User user) {
         Optional<User> userFromDB = userRepository.findByUserName(user.getUserName());
-        //TODO REMEMBER TO THROW EXCEPTION WHEN USE THIS
         if (!userFromDB.isPresent())
             return true;
         User temp = userFromDB.get();
-        temp.setRoles(UserRoles.ROLE_VOTER.toString());
+        temp.setRoles(UserRoles.ROLE_VOTER.name());
         userRepository.save(temp);
         return false;
     }
 
     public boolean updateUserVoterToDefault(String username) {
         Optional<User> userFromDB = userRepository.findByUserName(username);
-        //TODO REMEMBER TO THROW EXCEPTION WHEN USE THIS
         if (!userFromDB.isPresent())
             return false;
         User user = userFromDB.get();
-        user.setRoles(UserRoles.ROLE_USER.toString());
+        user.setRoles(UserRoles.ROLE_USER.name());
         userRepository.save(user);
         return true;
     }
 
     public boolean updateUserPassword(User user){
         Optional<User> userFromDB = userRepository.findByUserName(user.getUserName());
-        //TODO REMEMBER TO THROW EXCEPTION WHEN USE THIS
         if (!userFromDB.isPresent())
             return false;
         User temp = userFromDB.get();
@@ -140,10 +142,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public boolean saveUserDefaultAdmin(User user) {
         Optional<User> userFromDB = userRepository.findByUserName(user.getUserName());
-        //TODO REMEMBER TO THROW EXCEPTION WHEN USE THIS
         if (userFromDB.isPresent())
             return false;
-        user.setRoles(UserRoles.ROLE_ADMIN.toString());
+        user.setRoles(UserRoles.ROLE_ADMIN.name());
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         userRepository.save(user);
         return true;

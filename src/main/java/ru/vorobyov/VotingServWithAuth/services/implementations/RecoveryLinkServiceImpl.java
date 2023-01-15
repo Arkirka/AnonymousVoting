@@ -7,6 +7,7 @@ import ru.vorobyov.VotingServWithAuth.entities.User;
 import ru.vorobyov.VotingServWithAuth.repositories.RecoveryLinkRepository;
 import ru.vorobyov.VotingServWithAuth.services.interfaces.RecoveryLinkService;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.concurrent.CompletableFuture;
 
 @Service("recoveryLinkService")
@@ -20,7 +21,14 @@ public class RecoveryLinkServiceImpl implements RecoveryLinkService {
     @Async
     @Override
     public CompletableFuture<RecoveryLink> findRecoveryLinkByLink(String link) {
-        return CompletableFuture.completedFuture(recoveryLinkRepository.findRecoveryLinkByLink(link));
+        StringBuilder exceptionMessage = new StringBuilder("Recovery link ");
+        return CompletableFuture.completedFuture(
+                recoveryLinkRepository.findRecoveryLinkByLink(link).orElseThrow(() ->
+                    new EntityNotFoundException(
+                            exceptionMessage.append(link).append(" not found.").toString()
+                    )
+                )
+        );
     }
 
     @Async
@@ -41,10 +49,14 @@ public class RecoveryLinkServiceImpl implements RecoveryLinkService {
     @Async
     @Override
     public CompletableFuture<Integer> findIdByUser(User user) {
-        return CompletableFuture
-                .completedFuture(
-                        recoveryLinkRepository.findRecoveryLinkByUser(user).getId()
-                );
+        StringBuilder exceptionMessage = new StringBuilder("Recovery link ");
+        return CompletableFuture.completedFuture(
+            recoveryLinkRepository.findRecoveryLinkByUser(user)
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            exceptionMessage.append(user.getUserName()).append(" not found.").toString()
+                    ))
+                    .getId()
+        );
     }
 
     @Override

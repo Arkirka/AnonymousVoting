@@ -91,9 +91,10 @@ public class RegistrationController {
     }
 
     private void addLinkToDb(User user, String uuid){
-        ActivateLink activateLink = new ActivateLink();
-        activateLink.setLink(uuid);
-        activateLink.setUser(user);
-        activateLinkService.create(activateLink);
+        if (user == null || uuid == null )
+            throw new NullPointerException("User or uuid is empty!");
+        if (uuid.isEmpty())
+            throw new IllegalArgumentException("Uuid must not be empty!");
+        activateLinkService.create(new ActivateLink(uuid, user));
     }
 }

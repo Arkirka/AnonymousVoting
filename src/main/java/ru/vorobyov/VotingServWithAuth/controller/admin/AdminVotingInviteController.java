@@ -1,6 +1,5 @@
 package ru.vorobyov.VotingServWithAuth.controller.admin;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,22 +9,26 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.vorobyov.VotingServWithAuth.dataToObject.AdditionVotersToVotingDto;
 import ru.vorobyov.VotingServWithAuth.entities.User;
-import ru.vorobyov.VotingServWithAuth.services.interfaces.EmailService;
 import ru.vorobyov.VotingServWithAuth.services.implementations.UserDetailsServiceImpl;
-import ru.vorobyov.VotingServWithAuth.services.implementations.UserRoles;
+import ru.vorobyov.VotingServWithAuth.services.interfaces.EmailService;
 import ru.vorobyov.VotingServWithAuth.services.interfaces.VotingService;
+import ru.vorobyov.VotingServWithAuth.util.UserRoles;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
 public class AdminVotingInviteController {
-    @Autowired
-    private UserDetailsServiceImpl userService;
-    @Autowired
-    private VotingService votingService;
-    @Autowired
-    private EmailService emailService;
+    private final UserDetailsServiceImpl userService;
+    private final VotingService votingService;
+    private final EmailService emailService;
+
+    public AdminVotingInviteController(UserDetailsServiceImpl userService, VotingService votingService, EmailService emailService) {
+        this.userService = userService;
+        this.votingService = votingService;
+        this.emailService = emailService;
+    }
+
     @GetMapping("/admin/voting/invite")
     public String getTable(Model model) {
         AdditionVotersToVotingDto userForm = getAdditionVotersToVotingDtoWIthUsersFromDb();
